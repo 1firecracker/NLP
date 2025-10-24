@@ -239,6 +239,120 @@ class BaselineRunner:
         total_count = len(results)
         accuracy = correct_count / total_count if total_count > 0 else 0.0
         return accuracy
+    
+    def generate_analysis_report(self, results: List[Dict[str, Any]], method_name: str, 
+                                processing_time: float = 0.0) -> Dict[str, Any]:
+        """
+        生成单次结果分析报告
+        
+        Args:
+            results: 结果列表
+            method_name: 方法名称
+            processing_time: 处理时间
+            
+        Returns:
+            Dict: 分析报告
+        """
+        if not results:
+            return {}
+        
+        # 基础统计
+        total_questions = len(results)
+        correct_answers = sum(1 for r in results if r.get('correct', False))
+        accuracy = correct_answers / total_questions if total_questions > 0 else 0.0
+        
+        # Token统计
+        total_input_tokens = sum(r.get('token_stats', {}).get('prompt_tokens', 0) for r in results)
+        total_output_tokens = sum(r.get('token_stats', {}).get('completion_tokens', 0) for r in results)
+        total_tokens = total_input_tokens + total_output_tokens
+        avg_tokens_per_question = total_tokens / total_questions if total_questions > 0 else 0.0
+        
+        # 时间统计
+        avg_processing_time = processing_time / total_questions if total_questions > 0 else 0.0
+        
+        # 成本分析 (假设价格，可根据实际API调整)
+        input_token_cost_per_k = 0.0005  # $0.5 per 1K tokens
+        output_token_cost_per_k = 0.0015  # $1.5 per 1K tokens
+        estimated_cost = (total_input_tokens / 1000 * input_token_cost_per_k) + \
+                        (total_output_tokens / 1000 * output_token_cost_per_k)
+        
+        # 错误分析
+        error_count = sum(1 for r in results if r.get('error'))
+        error_rate = error_count / total_questions if total_questions > 0 else 0.0
+        
+        # 生成报告
+        report = {
+            "method_name": method_name,
+            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "hyperparameters": {
+                "temperature": config.TEMPERATURE,
+                "top_p": config.TOP_P,
+                "max_tokens": config.MAX_TOKENS,
+                "frequency_penalty": config.FREQUENCY_PENALTY,
+                "presence_penalty": config.PRESENCE_PENALTY
+            },
+            "performance_metrics": {
+                "total_questions": total_questions,
+                "correct_answers": correct_answers,
+                "accuracy": accuracy,
+                "wall_clock_time": processing_time,
+                "avg_processing_time_per_question": avg_processing_time
+            },
+            "token_usage": {
+                "total_input_tokens": total_input_tokens,
+                "total_output_tokens": total_output_tokens,
+                "total_tokens": total_tokens,
+                "avg_tokens_per_question": avg_tokens_per_question
+            },
+            "cost_analysis": {
+                "estimated_cost_usd": estimated_cost,
+                "cost_per_question": estimated_cost / total_questions if total_questions > 0 else 0.0
+            },
+            "error_analysis": {
+                "error_count": error_count,
+                "error_rate": error_rate
+            }
+        }
+        
+        return report
+    
+    def save_analysis_report(self, report: Dict[str, Any], method_name: str):
+        """
+        保存分析报告到文件
+        
+        Args:
+            report: 分析报告
+            method_name: 方法名称
+        """
+        # 生成文件名: 方法名_温度_top-p_时间戳
+        timestamp = time.strftime("%Y%m%d_%H%M%S")
+        temp_str = f"{config.TEMPERATURE:.1f}".replace('.', 'p')
+        top_p_str = f"{config.TOP_P:.1f}".replace('.', 'p')
+        
+        filename = f"{method_name}_temp{temp_str}_topp{top_p_str}_{timestamp}.json"
+        filepath = os.path.join(config.OUTPUT_DIR, filename)
+        
+        # 确保目录存在
+        os.makedirs(config.OUTPUT_DIR, exist_ok=True)
+        
+        # 保存报告
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(report, f, indent=2, ensure_ascii=False)
+        
+        print(f"📊 分析报告已保存到: {filepath}")
+        
+        # 打印简要统计
+        metrics = report['performance_metrics']
+        token_usage = report['token_usage']
+        cost_analysis = report['cost_analysis']
+        
+        print(f"📈 {method_name} 分析结果:")
+        print(f"   - 准确率: {metrics['accuracy']:.2%}")
+        print(f"   - 处理时间: {metrics['wall_clock_time']:.2f}秒")
+        print(f"   - 平均时间/问题: {metrics['avg_processing_time_per_question']:.2f}秒")
+        print(f"   - 平均Token/问题: {token_usage['avg_tokens_per_question']:.1f}")
+        print(f"   - 预估成本: ${cost_analysis['estimated_cost_usd']:.4f}")
+        print(f"   - 超参数: temp={config.TEMPERATURE}, top_p={config.TOP_P}")
 
 def main():
     """主函数"""
@@ -286,27 +400,47 @@ def main():
     
     # 运行baseline
     if args.method in ['zero-shot', 'both', 'all']:
+        start_time = time.time()
         zero_shot_results = runner.run_zero_shot(test_data)
+        processing_time = time.time() - start_time
+        
         runner.save_results(zero_shot_results, 'zeroshot.baseline.jsonl')
         
         accuracy = runner.calculate_accuracy(zero_shot_results)
         print(f"📊 Zero-shot 准确率: {accuracy:.4f} ({accuracy*100:.2f}%)")
+        
+        # 生成分析报告
+        report = runner.generate_analysis_report(zero_shot_results, "zero-shot", processing_time)
+        runner.save_analysis_report(report, "zero-shot")
     
     if args.method in ['few-shot', 'both', 'all']:
+        start_time = time.time()
         few_shot_results = runner.run_few_shot(test_data)
+        processing_time = time.time() - start_time
+        
         runner.save_results(few_shot_results, 'fewshot.baseline.jsonl')
         
         accuracy = runner.calculate_accuracy(few_shot_results)
         print(f"📊 Few-shot 准确率: {accuracy:.4f} ({accuracy*100:.2f}%)")
-    
+        
+        # 生成分析报告
+        report = runner.generate_analysis_report(few_shot_results, "few-shot", processing_time)
+        runner.save_analysis_report(report, "few-shot")
     
     if args.method in ['concurrent', 'all']:
         print("🚀 开始并发处理...")
+        start_time = time.time()
         concurrent_results = asyncio.run(runner.run_concurrent_baseline(test_data, "zero-shot"))
+        processing_time = time.time() - start_time
+        
         runner.save_results(concurrent_results, 'concurrent.baseline.jsonl')
         
         accuracy = runner.calculate_accuracy(concurrent_results)
         print(f"📊 并发Zero-shot 准确率: {accuracy:.4f} ({accuracy*100:.2f}%)")
+        
+        # 生成分析报告
+        report = runner.generate_analysis_report(concurrent_results, "concurrent", processing_time)
+        runner.save_analysis_report(report, "concurrent")
     
     # 打印token使用统计
     token_tracker.print_summary()
