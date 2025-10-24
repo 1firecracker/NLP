@@ -1,0 +1,32 @@
+{
+  "method_name": "zero-shot",
+  "timestamp": "2025-10-24 19:30:28",
+  "hyperparameters": {
+    "temperature": 0.1,
+    "top_p": 0.9,
+    "max_tokens": 2048,
+    "frequency_penalty": 0.0,
+    "presence_penalty": 0.0
+  },
+  "performance_metrics": {
+    "total_questions": 1319,
+    "correct_answers": 161,
+    "accuracy": 0.12206216830932524,
+    "wall_clock_time": 2050.200537443161,
+    "avg_processing_time_per_question": 1.5543597706164982
+  },
+  "token_usage": {
+    "total_input_tokens": 153046,
+    "total_output_tokens": 66432,
+    "total_tokens": 219478,
+    "avg_tokens_per_question": 166.3972706595906
+  },
+  "cost_analysis": {
+    "estimated_cost_usd": 0.176171,
+    "cost_per_question": 0.00013356406368460956
+  },
+  "error_analysis": {
+    "error_count": 0,
+    "error_rate": 0.0
+  }
+}
