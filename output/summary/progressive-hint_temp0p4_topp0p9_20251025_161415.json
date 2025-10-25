@@ -1,0 +1,32 @@
+{
+  "method_name": "progressive-hint",
+  "timestamp": "2025-10-25 16:14:15",
+  "hyperparameters": {
+    "temperature": 0.4,
+    "top_p": 0.9,
+    "max_tokens": 2048,
+    "frequency_penalty": 0.0,
+    "presence_penalty": 0.0
+  },
+  "performance_metrics": {
+    "total_questions": 1319,
+    "correct_answers": 680,
+    "accuracy": 0.5155420773313116,
+    "wall_clock_time": 11740.017236471176,
+    "avg_processing_time_per_question": 8.900695402934932
+  },
+  "token_usage": {
+    "total_input_tokens": 1364970,
+    "total_output_tokens": 177489,
+    "total_tokens": 1542459,
+    "avg_tokens_per_question": 1169.41546626232
+  },
+  "cost_analysis": {
+    "estimated_cost_usd": 0.9487185,
+    "cost_per_question": 0.0007192710386656558
+  },
+  "error_analysis": {
+    "error_count": 0,
+    "error_rate": 0.0
+  }
+}

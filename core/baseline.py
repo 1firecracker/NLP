@@ -54,7 +54,7 @@ def nshot_chats(n: int, question: str) -> list:
         return f"Answer:\nLet's think step by step.\n{s}"
 
     chats = [
-        {"role": "system", "content": "Your task is to solve a series of math word problems by providing the final answer. Output format: #### integer"}
+        {"role": "system", "content": f"Your task is to solve a series of math word problems by providing the final answer. Output format: #### integer . e.g.: #### 16 if the answer is 16"}
     ]
 
     # 添加few-shot示例

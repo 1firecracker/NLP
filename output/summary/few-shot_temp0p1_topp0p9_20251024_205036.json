@@ -1,0 +1,32 @@
+{
+  "method_name": "few-shot",
+  "timestamp": "2025-10-24 20:50:36",
+  "hyperparameters": {
+    "temperature": 0.1,
+    "top_p": 0.9,
+    "max_tokens": 2048,
+    "frequency_penalty": 0.0,
+    "presence_penalty": 0.0
+  },
+  "performance_metrics": {
+    "total_questions": 1319,
+    "correct_answers": 477,
+    "accuracy": 0.3616376042456406,
+    "wall_clock_time": 4342.551235198975,
+    "avg_processing_time_per_question": 3.2923057128119595
+  },
+  "token_usage": {
+    "total_input_tokens": 1346741,
+    "total_output_tokens": 214833,
+    "total_tokens": 1561574,
+    "avg_tokens_per_question": 1183.907505686126
+  },
+  "cost_analysis": {
+    "estimated_cost_usd": 0.99562,
+    "cost_per_question": 0.0007548294162244124
+  },
+  "error_analysis": {
+    "error_count": 0,
+    "error_rate": 0.0
+  }
+}

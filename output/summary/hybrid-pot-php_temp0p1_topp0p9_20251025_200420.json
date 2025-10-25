@@ -1,0 +1,32 @@
+{
+  "method_name": "hybrid-pot-php",
+  "timestamp": "2025-10-25 20:04:20",
+  "hyperparameters": {
+    "temperature": 0.2,
+    "top_p": 0.9,
+    "max_tokens": 2048,
+    "frequency_penalty": 0.0,
+    "presence_penalty": 0.0
+  },
+  "performance_metrics": {
+    "total_questions": 1319,
+    "correct_answers": 861,
+    "accuracy": 0.6527672479150872,
+    "wall_clock_time": 3407.6524093151093,
+    "avg_processing_time_per_question": 2.5835120616490594
+  },
+  "token_usage": {
+    "total_input_tokens": 823054,
+    "total_output_tokens": 112969,
+    "total_tokens": 936023,
+    "avg_tokens_per_question": 709.6459438968916
+  },
+  "cost_analysis": {
+    "estimated_cost_usd": 0.5809805,
+    "cost_per_question": 0.0004404704321455648
+  },
+  "error_analysis": {
+    "error_count": 0,
+    "error_rate": 0.0
+  }
+}

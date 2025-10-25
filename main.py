@@ -51,121 +51,59 @@ class BaselineRunner:
             print(f"❌ 加载测试数据失败: {e}")
             return []
     
-    def run_zero_shot(self, test_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """
-        运行Zero-shot baseline
+    async def run_zero_shot(self, test_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """运行Zero-shot baseline（使用并发处理）"""
+        print(f"\n🚀 开始Zero-shot baseline...")
         
-        Args:
-            test_data: 测试数据
-            
-        Returns:
-            List[Dict]: 结果列表
-        """
-        print("\n🚀 开始Zero-shot baseline...")
-        results = []
+        # 创建并发处理器
+        processor = ConcurrentProcessor(max_concurrent=5, rate_limit=100)
         
-        for i, item in enumerate(test_data):
-            if config.VERBOSE:
-                print(f"处理问题 {i+1}/{len(test_data)}: {item['question'][:50]}...")
-            
-            # 构建zero-shot prompt
-            messages = nshot_chats(n=0, question=item['question'])
-            
-            try:
-                # 调用API
-                response, token_stats = self.client.generate_response(messages)
-                token_tracker.add_usage(token_stats)
-                
-                # 提取答案
-                predicted_answer = extract_ans_from_response(response)
-                ground_truth = extract_ans_from_response(item['answer'])
-                
-                # 保存结果
-                result = {
-                    'question': item['question'],
-                    'ground_truth': ground_truth,
-                    'predicted_answer': predicted_answer,
-                    'response': response,
-                    'token_stats': token_stats,
-                    'correct': predicted_answer == ground_truth
-                }
-                results.append(result)
-                
-                if config.VERBOSE:
-                    print(f"  预测答案: {predicted_answer}, 正确答案: {ground_truth}, 正确: {result['correct']}")
-                    
-            except Exception as e:
-                print(f"❌ 处理问题 {i+1} 时出错: {e}")
-                results.append({
-                    'question': item['question'],
-                    'ground_truth': extract_ans_from_response(item['answer']),
-                    'predicted_answer': None,
-                    'response': None,
-                    'token_stats': None,
-                    'correct': False,
-                    'error': str(e)
-                })
+        # 并发处理
+        results = await processor.process_batch(test_data, method="zero-shot")
         
-        print(f"✅ Zero-shot baseline完成，处理了 {len(results)} 个问题")
-        return results
+        # 转换为标准格式
+        standard_results = []
+        for result in results:
+            standard_results.append({
+                'question': result.question,
+                'ground_truth': result.ground_truth,
+                'predicted_answer': result.predicted_answer,
+                'response': result.response,
+                'token_stats': result.token_stats,
+                'correct': result.correct,
+                'processing_time': result.processing_time,
+                'error': result.error
+            })
+        
+        print(f"✅ Zero-shot baseline完成，处理了 {len(standard_results)} 个问题")
+        return standard_results
     
-    def run_few_shot(self, test_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """
-        运行Few-shot baseline
+    async def run_few_shot(self, test_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """运行Few-shot baseline（使用并发处理）"""
+        print(f"\n🚀 开始Few-shot baseline...")
         
-        Args:
-            test_data: 测试数据
-            
-        Returns:
-            List[Dict]: 结果列表
-        """
-        print("\n🚀 开始Few-shot baseline...")
-        results = []
+        # 创建并发处理器
+        processor = ConcurrentProcessor(max_concurrent=5, rate_limit=100)
         
-        for i, item in enumerate(test_data):
-            if config.VERBOSE:
-                print(f"处理问题 {i+1}/{len(test_data)}: {item['question'][:50]}...")
-            
-            # 构建few-shot prompt (使用8个示例)
-            messages = nshot_chats(n=8, question=item['question'])
-            
-            try:
-                # 调用API
-                response, token_stats = self.client.generate_response(messages)
-                token_tracker.add_usage(token_stats)
-                
-                # 提取答案
-                predicted_answer = extract_ans_from_response(response)
-                ground_truth = extract_ans_from_response(item['answer'])
-                
-                # 保存结果
-                result = {
-                    'question': item['question'],
-                    'ground_truth': ground_truth,
-                    'predicted_answer': predicted_answer,
-                    'response': response,
-                    'token_stats': token_stats,
-                    'correct': predicted_answer == ground_truth
-                }
-                results.append(result)
-                
-                if config.VERBOSE:
-                    print(f"  预测答案: {predicted_answer}, 正确答案: {ground_truth}, 正确: {result['correct']}")
-                    
-            except Exception as e:
-                print(f"❌ 处理问题 {i+1} 时出错: {e}")
-                results.append({
-                    'question': item['question'],
-                    'ground_truth': extract_ans_from_response(item['answer']),
-                    'predicted_answer': None,
-                    'response': None,
-                    'token_stats': None,
-                    'correct': False,
-                    'error': str(e)
-                })
+        # 并发处理
+        results = await processor.process_batch(test_data, method="few-shot")
         
-        print(f"✅ Few-shot baseline完成，处理了 {len(results)} 个问题")
-        return results
+        # 转换为标准格式
+        standard_results = []
+        for result in results:
+            standard_results.append({
+                'question': result.question,
+                'ground_truth': result.ground_truth,
+                'predicted_answer': result.predicted_answer,
+                'response': result.response,
+                'token_stats': result.token_stats,
+                'correct': result.correct,
+                'processing_time': result.processing_time,
+                'error': result.error
+            })
+        
+        print(f"✅ Few-shot baseline完成，处理了 {len(standard_results)} 个问题")
+        return standard_results
     
     async def run_concurrent_baseline(self, test_data: List[Dict[str, Any]], method: str = "zero-shot") -> List[Dict[str, Any]]:
         """
@@ -180,8 +118,8 @@ class BaselineRunner:
         """
         print(f"\n🚀 开始并发{method} baseline...")
         
-        # 创建并发处理器
-        processor = ConcurrentProcessor(max_concurrent=10, rate_limit=100)
+        # 创建并发处理器（优化速率限制）
+        processor = ConcurrentProcessor(max_concurrent=5, rate_limit=100)
         
         # 并发处理
         results = await processor.process_batch(test_data, method=method)
@@ -203,6 +141,86 @@ class BaselineRunner:
         print(f"✅ 并发{method} baseline完成，处理了 {len(standard_results)} 个问题")
         return standard_results
     
+    async def run_progressive_hint(self, test_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """运行Progressive-Hint baseline（使用并发处理）"""
+        print(f"\n🚀 开始Progressive-Hint baseline...")
+        
+        # 创建并发处理器
+        processor = ConcurrentProcessor(max_concurrent=5, rate_limit=100)
+        
+        # 并发处理
+        results = await processor.process_batch(test_data, method="progressive-hint")
+        
+        # 转换为标准格式
+        standard_results = []
+        for result in results:
+            standard_results.append({
+                'question': result.question,
+                'ground_truth': result.ground_truth,
+                'predicted_answer': result.predicted_answer,
+                'response': result.response,
+                'token_stats': result.token_stats,
+                'correct': result.correct,
+                'processing_time': result.processing_time,
+                'error': result.error
+            })
+        
+        print(f"✅ Progressive-Hint baseline完成，处理了 {len(standard_results)} 个问题")
+        return standard_results
+    
+    async def run_program_of_thoughts(self, test_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """运行Program of Thoughts baseline（使用并发处理）"""
+        print(f"\n🚀 开始Program of Thoughts baseline...")
+        
+        # 创建并发处理器（优化速率限制）
+        processor = ConcurrentProcessor(max_concurrent=5, rate_limit=100)
+        
+        # 并发处理
+        results = await processor.process_batch(test_data, method="program-of-thoughts")
+        
+        # 转换为标准格式
+        standard_results = []
+        for result in results:
+            standard_results.append({
+                'question': result.question,
+                'ground_truth': result.ground_truth,
+                'predicted_answer': result.predicted_answer,
+                'response': result.response,
+                'token_stats': result.token_stats,
+                'correct': result.correct,
+                'processing_time': result.processing_time,
+                'error': result.error
+            })
+        
+        print(f"✅ Program of Thoughts baseline完成，处理了 {len(standard_results)} 个问题")
+        return standard_results
+    
+    async def run_hybrid_pot_php(self, test_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """运行混合PoT和PHP baseline（使用并发处理）"""
+        print(f"\n🚀 开始混合PoT和PHP baseline...")
+        
+        # 创建并发处理器
+        processor = ConcurrentProcessor(max_concurrent=5, rate_limit=100)
+        
+        # 并发处理
+        results = await processor.process_batch(test_data, method="hybrid-pot-php")
+        
+        # 转换为标准格式
+        standard_results = []
+        for result in results:
+            standard_results.append({
+                'question': result.question,
+                'ground_truth': result.ground_truth,
+                'predicted_answer': result.predicted_answer,
+                'response': result.response,
+                'token_stats': result.token_stats,
+                'correct': result.correct,
+                'processing_time': result.processing_time,
+                'error': result.error
+            })
+        
+        print(f"✅ 混合PoT和PHP baseline完成，处理了 {len(standard_results)} 个问题")
+        return standard_results
     
     def save_results(self, results: List[Dict[str, Any]], filename: str):
         """
@@ -330,10 +348,10 @@ class BaselineRunner:
         top_p_str = f"{config.TOP_P:.1f}".replace('.', 'p')
         
         filename = f"{method_name}_temp{temp_str}_topp{top_p_str}_{timestamp}.json"
-        filepath = os.path.join(config.OUTPUT_DIR, filename)
+        filepath = os.path.join(config.SUMMARY_DIR, filename)
         
         # 确保目录存在
-        os.makedirs(config.OUTPUT_DIR, exist_ok=True)
+        os.makedirs(config.SUMMARY_DIR, exist_ok=True)
         
         # 保存报告
         with open(filepath, 'w', encoding='utf-8') as f:
@@ -354,13 +372,13 @@ class BaselineRunner:
         print(f"   - 预估成本: ${cost_analysis['estimated_cost_usd']:.4f}")
         print(f"   - 超参数: temp={config.TEMPERATURE}, top_p={config.TOP_P}")
 
-def main():
+async def main():
     """主函数"""
     parser = argparse.ArgumentParser(description='GSM8K Baseline Runner')
     parser.add_argument('--test-file', default=config.TEST_FILE, help='测试文件路径')
     parser.add_argument('--output-dir', default=config.OUTPUT_DIR, help='输出目录')
     parser.add_argument('--max-questions', type=int, default=None, help='最大处理问题数量')
-    parser.add_argument('--method', choices=['zero-shot', 'few-shot', 'concurrent', 'all'], default='both', help='运行的方法')
+    parser.add_argument('--method', choices=['zero-shot', 'few-shot', 'concurrent', 'progressive-hint', 'program-of-thoughts', 'hybrid-pot-php', 'all'], default='both', help='运行的方法')
     parser.add_argument('--verbose', action='store_true', help='详细输出')
     
     args = parser.parse_args()
@@ -401,7 +419,7 @@ def main():
     # 运行baseline
     if args.method in ['zero-shot', 'both', 'all']:
         start_time = time.time()
-        zero_shot_results = runner.run_zero_shot(test_data)
+        zero_shot_results = await runner.run_zero_shot(test_data)
         processing_time = time.time() - start_time
         
         runner.save_results(zero_shot_results, 'zeroshot.baseline.jsonl')
@@ -415,7 +433,7 @@ def main():
     
     if args.method in ['few-shot', 'both', 'all']:
         start_time = time.time()
-        few_shot_results = runner.run_few_shot(test_data)
+        few_shot_results = await runner.run_few_shot(test_data)
         processing_time = time.time() - start_time
         
         runner.save_results(few_shot_results, 'fewshot.baseline.jsonl')
@@ -442,10 +460,53 @@ def main():
         report = runner.generate_analysis_report(concurrent_results, "concurrent", processing_time)
         runner.save_analysis_report(report, "concurrent")
     
+    if args.method in ['progressive-hint', 'all']:
+        start_time = time.time()
+        progressive_hint_results = await runner.run_progressive_hint(test_data)
+        processing_time = time.time() - start_time
+        
+        runner.save_results(progressive_hint_results, 'progressive_hint.baseline.jsonl')
+        
+        accuracy = runner.calculate_accuracy(progressive_hint_results)
+        print(f"📊 Progressive-Hint 准确率: {accuracy:.4f} ({accuracy*100:.2f}%)")
+        
+        # 生成分析报告
+        report = runner.generate_analysis_report(progressive_hint_results, "progressive-hint", processing_time)
+        runner.save_analysis_report(report, "progressive-hint")
+    
+    if args.method in ['program-of-thoughts', 'all']:
+        start_time = time.time()
+        pot_results = await runner.run_program_of_thoughts(test_data)
+        processing_time = time.time() - start_time
+        
+        runner.save_results(pot_results, 'program_of_thoughts.baseline.jsonl')
+        
+        accuracy = runner.calculate_accuracy(pot_results)
+        print(f"📊 Program of Thoughts 准确率: {accuracy:.4f} ({accuracy*100:.2f}%)")
+        
+        # 生成分析报告
+        report = runner.generate_analysis_report(pot_results, "program-of-thoughts", processing_time)
+        runner.save_analysis_report(report, "program-of-thoughts")
+    
+    if args.method in ['hybrid-pot-php', 'all']:
+        start_time = time.time()
+        hybrid_results = await runner.run_hybrid_pot_php(test_data)
+        processing_time = time.time() - start_time
+        
+        runner.save_results(hybrid_results, 'hybrid_pot_php.baseline.jsonl')
+        
+        accuracy = runner.calculate_accuracy(hybrid_results)
+        print(f"📊 混合PoT和PHP 准确率: {accuracy:.4f} ({accuracy*100:.2f}%)")
+        
+        # 生成分析报告
+        report = runner.generate_analysis_report(hybrid_results, "hybrid-pot-php", processing_time)
+        runner.save_analysis_report(report, "hybrid-pot-php")
+    
     # 打印token使用统计
     token_tracker.print_summary()
     
     print("\n🎉 Baseline执行完成！")
 
 if __name__ == "__main__":
-    main()
+    import asyncio
+    asyncio.run(main())

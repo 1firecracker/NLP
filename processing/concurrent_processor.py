@@ -117,8 +117,11 @@ class ConcurrentProcessor:
                 # 速率限制
                 await self.rate_limiter.wait_if_needed()
                 
-                start_time = time.time()
+                # 🔥 添加进度打印
                 question = question_data['question']
+                print(f"🔄 处理问题 {current}/{total}: {question[:50]}...")
+                
+                start_time = time.time()
                 ground_truth = extract_ans_from_response(question_data['answer'])
                 
                 # 构建prompt
@@ -129,6 +132,69 @@ class ConcurrentProcessor:
                 elif method == "tree-prompting":
                     # TODO: 实现Tree Prompting
                     messages = nshot_chats(n=n_examples, question=question)
+                elif method == "program-of-thoughts":
+                    # 使用Program of Thoughts方法（异步处理）
+                    from methods.program_of_thoughts_method import ProgramOfThoughtsMethod
+                    pot_method = ProgramOfThoughtsMethod({})
+                    # 异步调用solve方法
+                    loop = asyncio.get_event_loop()
+                    result = await loop.run_in_executor(None, pot_method.solve, question, ground_truth)
+                    
+                    # 🔥 添加完成提示
+                    print(f"✅ 问题 {current}/{total} 完成 ({result.processing_time:.2f}秒) - 预测: {result.predicted_answer}, 正确: {result.correct}")
+                    
+                    return ProcessingResult(
+                        question=question,
+                        ground_truth=ground_truth,
+                        predicted_answer=result.predicted_answer,
+                        response=result.response,
+                        token_stats=result.token_stats,
+                        correct=result.correct,
+                        processing_time=result.processing_time,
+                        error=result.error
+                    )
+                elif method == "progressive-hint":
+                    # 使用Progressive-Hint方法（异步处理）
+                    from methods.progressive_hint_method import ProgressiveHintMethod
+                    php_method = ProgressiveHintMethod({})
+                    # 异步调用solve方法
+                    loop = asyncio.get_event_loop()
+                    result = await loop.run_in_executor(None, php_method.solve, question, ground_truth)
+                    
+                    # 🔥 添加完成提示
+                    print(f"✅ 问题 {current}/{total} 完成 ({result.processing_time:.2f}秒) - 预测: {result.predicted_answer}, 正确: {result.correct}")
+                    
+                    return ProcessingResult(
+                        question=question,
+                        ground_truth=ground_truth,
+                        predicted_answer=result.predicted_answer,
+                        response=result.response,
+                        token_stats=result.token_stats,
+                        correct=result.correct,
+                        processing_time=result.processing_time,
+                        error=result.error
+                    )
+                elif method == "hybrid-pot-php":
+                    # 使用混合PoT和PHP方法（异步处理）
+                    from methods.hybrid_pot_php_method import HybridPoTPHPMethod
+                    hybrid_method = HybridPoTPHPMethod({})
+                    # 异步调用solve方法
+                    loop = asyncio.get_event_loop()
+                    result = await loop.run_in_executor(None, hybrid_method.solve, question, ground_truth)
+                    
+                    # 🔥 添加完成提示
+                    print(f"✅ 问题 {current}/{total} 完成 ({result.processing_time:.2f}秒) - 预测: {result.predicted_answer}, 正确: {result.correct}")
+                    
+                    return ProcessingResult(
+                        question=question,
+                        ground_truth=ground_truth,
+                        predicted_answer=result.predicted_answer,
+                        response=result.response,
+                        token_stats=result.token_stats,
+                        correct=result.correct,
+                        processing_time=result.processing_time,
+                        error=result.error
+                    )
                 else:
                     raise ValueError(f"未知的处理方法: {method}")
                 
@@ -155,8 +221,8 @@ class ConcurrentProcessor:
                     processing_time=processing_time
                 )
                 
-                if config.VERBOSE:
-                    print(f"✅ 问题 {current}/{total}: 预测={predicted_answer}, 正确={ground_truth}, 正确={result.correct}")
+                # 🔥 添加完成提示
+                print(f"✅ 问题 {current}/{total} 完成 ({processing_time:.2f}秒) - 预测: {predicted_answer}, 正确: {result.correct}")
                 
                 return result
                 
@@ -214,12 +280,14 @@ class RateLimiter:
             # 清理1分钟前的请求记录
             self.requests = [req_time for req_time in self.requests if now - req_time < 60]
             
-            # 如果请求数超过限制，等待
+            # 如果请求数超过限制，等待（优化等待时间）
             if len(self.requests) >= self.requests_per_minute:
                 wait_time = 60 - (now - self.requests[0])
                 if wait_time > 0:
-                    print(f"⏳ 速率限制，等待 {wait_time:.2f} 秒...")
-                    await asyncio.sleep(wait_time)
+                    # 减少等待时间，避免过度延迟
+                    actual_wait = min(wait_time, 20)  # 最多等待10秒
+                    print(f"⏳ 速率限制，等待 {actual_wait:.2f} 秒...")
+                    await asyncio.sleep(actual_wait)
                     # 重新清理请求记录
                     now = time.time()
                     self.requests = [req_time for req_time in self.requests if now - req_time < 60]

@@ -13,7 +13,7 @@ class Config:
     OPENAI_BASE_URL: Optional[str] = "https://api.siliconflow.cn/v1"  # 硅基流动API端点
     
     # 推理参数
-    TEMPERATURE: float = 0.1
+    TEMPERATURE: float = 0.7
     TOP_P: float = 0.9
     MAX_TOKENS: int = 2048
     FREQUENCY_PENALTY: float = 0.0
@@ -23,6 +23,7 @@ class Config:
     TRAIN_FILE: str = "data/train.jsonl"
     TEST_FILE: str = "data/test.jsonl"
     OUTPUT_DIR: str = "output/results"
+    SUMMARY_DIR: str = "output/summary"
     
     # 批处理配置
     BATCH_SIZE: int = 10

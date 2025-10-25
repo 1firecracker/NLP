@@ -1,139 +1,270 @@
-# GSM8K Baseline 实现项目
+# GSM8K Baseline Implementation Project
 
-## 项目概述
-本项目实现GSM8K数学推理任务的完整baseline系统，包括zero-shot和few-shot prompting方法。
+## Project Overview
+This project implements a comprehensive baseline system for the GSM8K mathematical reasoning task, featuring multiple prompting methods, concurrent processing, and advanced hybrid strategies.
 
-## 项目架构
+## Project Architecture
 
 ```
-GSM8K项目架构
-├── data/                          # 数据层
+GSM8K Project Structure
+├── data/                          # Data Layer
 │   ├── __init__.py
-│   ├── config.py (配置文件)
-│   ├── train.jsonl (训练数据)
-│   └── test.jsonl (测试数据)
-├── core/                          # 核心层
+│   ├── config.py (Configuration)
+│   ├── train.jsonl (Training data)
+│   └── test.jsonl (Test data)
+├── core/                          # Core Layer
 │   ├── __init__.py
-│   ├── baseline.py (prompting模板)
-│   ├── llm_client.py (LLM API客户端)
-│   └── evaluation.py (评估工具)
-├── methods/                       # 方法层
+│   ├── baseline.py (Prompting templates)
+│   ├── llm_client.py (LLM API client)
+│   └── evaluation.py (Evaluation tools)
+├── methods/                       # Methods Layer
 │   ├── __init__.py
-│   ├── base_method.py (基础方法接口)
-│   ├── zero_shot_method.py (Zero-shot方法)
-│   └── few_shot_method.py (Few-shot方法)
-├── analysis/                      # 分析层
+│   ├── base_method.py (Base method interface)
+│   ├── zero_shot_method.py (Zero-shot method)
+│   ├── few_shot_method.py (Few-shot method)
+│   ├── progressive_hint_method.py (Progressive-Hint method)
+│   ├── program_of_thoughts_method.py (Program of Thoughts method)
+│   └── hybrid_pot_php_method.py (Hybrid PoT-PHP method)
+├── processing/                    # Processing Layer
 │   ├── __init__.py
-│   ├── base_analyzer.py (分析器基类)
-│   ├── accuracy_analyzer.py (准确率分析)
-│   ├── cost_analyzer.py (成本分析)
-│   └── method_comparator.py (方法比较)
-├── processing/                    # 处理层
-│   ├── __init__.py
-│   └── concurrent_processor.py (并发处理)
-├── output/                        # 输出层
-│   └── results/ (结果目录)
-│       ├── zeroshot.baseline.jsonl
-│       ├── fewshot.baseline.jsonl
-│       └── concurrent.baseline.jsonl
-├── main.py                        # 主程序
-├── README.md                      # 文档
-├── requirements.txt               # 依赖
-└── assign.txt                     # 作业要求
+│   └── concurrent_processor.py (Concurrent processing)
+├── output/                        # Output Layer
+│   ├── results/ (Raw results)
+│   │   ├── zeroshot.baseline.jsonl
+│   │   ├── fewshot.baseline.jsonl
+│   │   ├── progressive_hint.baseline.jsonl
+│   │   ├── program_of_thoughts.baseline.jsonl
+│   │   └── hybrid_pot_php.baseline.jsonl
+│   └── summary/ (Analysis reports)
+│       ├── zero-shot_temp0p1_topp0p9_*.json
+│       ├── few-shot_temp0p1_topp0p9_*.json
+│       ├── progressive-hint_temp0p3_topp0p9_*.json
+│       ├── program-of-thoughts_temp0p1_topp0p9_*.json
+│       └── hybrid-pot-php_temp0p1_topp0p9_*.json
+├── main.py                        # Main execution script
+├── README.md                      # Documentation
+├── README_CN.md                   # Chinese documentation
+├── requirements.txt               # Dependencies
+└── assign.txt                     # Assignment requirements
 ```
 
-## 项目完成状态
+## Project Status
 
-### ✅ 所有步骤已完成
+### ✅ All Steps Completed
 
-#### **步骤1: 基础设施搭建** ✅
-- ✅ 硅基流动API集成 (DeepSeek-R1-Distill-Qwen-7B)
-- ✅ 配置管理系统 (data/config.py)
-- ✅ LLM客户端和错误处理 (core/llm_client.py)
-- ✅ 依赖管理和项目结构 (requirements.txt)
-- ✅ 主执行脚本框架 (main.py)
+#### **Step 1: Infrastructure Setup** ✅
+- ✅ SiliconFlow API integration (tencent/Hunyuan-MT-7B)
+- ✅ Configuration management system (data/config.py)
+- ✅ LLM client and error handling (core/llm_client.py)
+- ✅ Dependency management and project structure (requirements.txt)
+- ✅ Main execution script framework (main.py)
 
-#### **步骤2: 核心功能实现** ✅
-- ✅ Zero-shot和Few-shot prompting模板 (core/baseline.py)
-- ✅ 智能答案提取 (支持\boxed{}和####格式) (core/evaluation.py)
-- ✅ Token统计和成本跟踪
-- ✅ 批量处理框架
-- ✅ 结果保存和评估
+#### **Step 2: Core Functionality Implementation** ✅
+- ✅ Zero-shot and Few-shot prompting templates (core/baseline.py)
+- ✅ Intelligent answer extraction (supports \boxed{} and #### formats) (core/evaluation.py)
+- ✅ Token statistics and cost tracking
+- ✅ Batch processing framework
+- ✅ Result saving and evaluation
 
-#### **步骤3: 模块化架构重构** ✅
-- ✅ 分层目录结构 (data/core/methods/analysis/processing)
-- ✅ 模块化方法设计 (BaseMethod接口)
-- ✅ 插件化分析器 (BaseAnalyzer接口)
-- ✅ 标准化数据格式 (MethodResult)
-- ✅ 项目精简 (移除冗余文件)
+#### **Step 3: Modular Architecture Refactoring** ✅
+- ✅ Layered directory structure (data/core/methods/analysis/processing)
+- ✅ Modular method design (BaseMethod interface)
+- ✅ Plugin-based analyzers (BaseAnalyzer interface)
+- ✅ Standardized data format (MethodResult)
+- ✅ Project optimization (removed redundant files)
 
-#### **步骤4: 测试和优化** ✅
-- ✅ 端到端测试通过
-- ✅ 并发处理优化 (10个并发，0.54秒/问题)
-- ✅ 完整功能验证
-- ✅ 文档完善
+#### **Step 4: Advanced Methods Implementation** ✅
+- ✅ Progressive-Hint Prompting (PHP) method
+- ✅ Program of Thoughts (PoT) method
+- ✅ Hybrid PoT-PHP strategy
+- ✅ Concurrent processing optimization
+- ✅ Progress tracking and monitoring
 
-## 技术配置
+#### **Step 5: Testing and Optimization** ✅
+- ✅ End-to-end testing passed
+- ✅ Concurrent processing optimization (5 concurrent, 1.07s/question)
+- ✅ Complete functionality verification
+- ✅ Documentation completion
 
-- **API服务商**: 硅基流动 (SiliconFlow) - 兼容OpenAI API
-- **模型**: DeepSeek-R1-Distill-Qwen-7B
-- **配置管理**: 配置文件
-- **依赖管理**: pip + requirements.txt
+## Implemented Methods
 
-## 使用方法
+### **Basic Methods**
+- **Zero-shot**: Direct prompting without examples
+- **Few-shot**: Prompting with 8 examples
+- **Concurrent**: Parallel processing for performance
 
-### 基础使用
+### **Advanced Methods**
+- **Progressive-Hint Prompting (PHP)**: Multi-round hinting strategy
+  - Temperature: 0.5 (creativity for diverse hints)
+  - Few-shot: 8 examples
+  - Max hints: 3 rounds
+  - Accuracy: ~53.5%
+
+- **Program of Thoughts (PoT)**: Code generation and execution
+  - Temperature: 0.1 (precision for code generation)
+  - Zero-shot: Direct code generation
+  - Python execution with error handling
+  - Accuracy: ~40%
+
+- **Hybrid PoT-PHP**: Intelligent strategy combination
+  - PoT first (fast, precise)
+  - PHP fallback (robust, multi-round)
+  - Dynamic parameter adjustment
+  - Accuracy: ~66.7%
+
+## Technical Configuration
+
+- **API Provider**: SiliconFlow - OpenAI API compatible
+- **Model**: tencent/Hunyuan-MT-7B
+- **API Endpoint**: https://api.siliconflow.cn/v1
+- **Temperature**: 0.1 (default)
+- **Top-P**: 0.9
+- **Max Tokens**: 2048
+- **Configuration Management**: config.py
+- **Dependency Management**: pip + requirements.txt
+- **Concurrent Processing**: asyncio + aiohttp
+
+## Usage
+
+### Basic Usage
 ```bash
-# 安装依赖
+# Install dependencies
 pip install -r requirements.txt
 
-# 配置API密钥
-# 编辑data/config.py中的OPENAI_API_KEY
+# Configure API key
+# Edit OPENAI_API_KEY in data/config.py
 
-# 运行baseline
-python main.py --method all
-```
-
-### 模块化架构使用
-```bash
-# 运行所有方法
+# Run all methods
 python main.py --method all
 
-# 运行特定方法
+# Run specific method
 python main.py --method zero-shot
 python main.py --method few-shot
-python main.py --method concurrent
+python main.py --method progressive-hint
+python main.py --method program-of-thoughts
+python main.py --method hybrid-pot-php
 
-# 添加新方法
-# 1. 在methods/目录实现BaseMethod接口
-# 2. 更新main.py中的导入和调用
+# Test with limited questions
+python main.py --method hybrid-pot-php --max-questions 5 --verbose
 ```
 
-## 输出文件
+### Advanced Usage
+```bash
+# Run with custom parameters
+python main.py --method all --max-questions 200 --verbose
 
-### 输出文件
-- `output/results/zeroshot.baseline.jsonl` - Zero-shot结果
-- `output/results/fewshot.baseline.jsonl` - Few-shot结果
-- `output/results/concurrent.baseline.jsonl` - 并发Zero-shot结果
+# Run specific advanced method
+python main.py --method progressive-hint --max-questions 50
+python main.py --method program-of-thoughts --max-questions 50
+python main.py --method hybrid-pot-php --max-questions 50
+```
 
-## 项目功能验证
+## Output Files
 
-### ✅ 完整功能测试
-- ✅ **API连接**: 硅基流动API正常工作
-- ✅ **数据加载**: 1319条测试数据成功加载
-- ✅ **Zero-shot**: 5个问题，40%准确率
-- ✅ **Few-shot**: 5个问题，20%准确率  
-- ✅ **并发处理**: 5个问题，40%准确率，0.54秒/问题
-- ✅ **结果保存**: 所有结果正确保存到output/results/
+### Raw Results
+- `output/results/zeroshot.baseline.jsonl` - Zero-shot results
+- `output/results/fewshot.baseline.jsonl` - Few-shot results
+- `output/results/progressive_hint.baseline.jsonl` - Progressive-Hint results
+- `output/results/program_of_thoughts.baseline.jsonl` - Program of Thoughts results
+- `output/results/hybrid_pot_php.baseline.jsonl` - Hybrid method results
 
-### 📊 性能指标
-- **处理速度**: 并发处理0.54秒/问题
-- **并发设置**: 10个并发请求
-- **Token效率**: 平均470.3 tokens/问题
-- **准确率**: Zero-shot和并发方法表现最佳 (40%)
+### Analysis Reports
+- `output/summary/*_temp0p1_topp0p9_*.json` - Detailed analysis reports
+- Includes accuracy, processing time, token usage, cost estimation
 
-### 🏗️ 架构优势
-- **模块化设计**: 清晰的分层结构
-- **易于维护**: 相关功能集中管理
-- **易于扩展**: 新功能可快速添加
-- **精简高效**: 无冗余文件，结构清晰
+## Performance Metrics
+
+### **Method Comparison**
+| Method | Accuracy | Avg Time/Question | Token Usage | Strategy |
+|--------|----------|-------------------|-------------|----------|
+| Zero-shot | 12.21% | 1.55s | 166.4 tokens | Direct prompting |
+| Few-shot | 36.16% | 3.29s | 1,183.9 tokens | Example-based |
+| Progressive-Hint | 53.53% | 1.07s | 1,168 tokens | Multi-round hints (temp=0.5) |
+| Program of Thoughts | 42.5% | 1.68s | 379 tokens | Code execution (temp=0.1) |
+| Hybrid PoT-PHP | 65.28% | 12.78s | 438 tokens | Intelligent fallback |
+
+### **Detailed Baseline Analysis**
+| Evaluation Dimension | Zero-shot | Few-shot | Analysis |
+|---------------------|-----------|----------|----------|
+| **Method Name** | Zero-shot | Few-shot | Zero-shot: no examples; Few-shot: provides few examples to guide the model |
+| **Total Questions** | 1,319 | 1,319 | Same sample size for fair comparison |
+| **Accuracy** | 12.21% | 36.16% | Few-shot accuracy improved by ~2.96x, significant effect |
+| **Total Processing Time** | 2,050.20s | 4,342.55s | Few-shot takes ~2.12x longer than Zero-shot |
+| **Avg Time per Question** | 1.55s | 3.29s | Few-shot slower due to longer input (with examples) |
+| **Total Token Usage** | 219,478 | 1,561,574 | Few-shot uses ~7.1x more tokens |
+| **Avg Tokens per Question** | 166.4 | 1,183.9 | Few-shot uses 1,017 more tokens per question |
+
+### **Progressive-Hint Method Evolution**
+| Version | Zero-shot | Few-shot | Logic Mod 1 | Logic Mod 2 | Accuracy |
+|---------|-----------|----------|-------------|-------------|----------|
+| 1 | ✓ | | | | 19.48% |
+| 2 | | ✓ | | | 38.47% |
+| 3 | | ✓ | ✓ | | 35.20% |
+| 4 | | ✓ | | ✓ | **50.50%** |
+
+**Logic Modifications:**
+- **Logic Mod 1**: Enhanced output length detection - prompt modification when output is too long
+- **Logic Mod 2**: Replaced length detection with format detection - prompt format correction when answer format is problematic
+
+### **Hyperparameter Optimization**
+
+#### **Progressive-Hint Temperature Tuning**
+| Temperature | Accuracy |
+|-------------|----------|
+| 0.1 | 50.50% |
+| 0.2 | 50.50% |
+| 0.3 | 51.20% |
+| 0.4 | 51.55% |
+| **0.5** | **53.53%** |
+
+#### **Program of Thoughts Method Evolution**
+| Version | Zero-shot | Few-shot | Add Code Shot | Accuracy |
+|---------|-----------|----------|--------------|----------|
+| 1 | ✓ | | | **42.50%** |
+| 2 | | ✓ | | 32.00% |
+| 3 | | ✓ | ✓ | 25.50% |
+
+**Key Finding**: Zero-shot works best for Program of Thoughts method. Few-shot examples have negative effects as the model is not specifically trained for code generation.
+
+#### **Program of Thoughts Temperature Tuning**
+| Temperature | Accuracy |
+|-------------|----------|
+| **0.1** | **42.5%** |
+| 0.2 | - |
+| 0.3 | - |
+| 0.4 | - |
+| 0.5 | - |
+
+### **Concurrent Processing**
+- **Concurrency**: 5-10 parallel requests
+- **Rate Limiting**: 100-200 requests/minute
+- **Performance**: 3-5x speed improvement
+- **Error Handling**: Automatic retry with exponential backoff
+
+## Architecture Advantages
+
+- **Modular Design**: Clear layered structure
+- **Easy Maintenance**: Related functionality grouped together
+- **Easy Extension**: New methods can be quickly added
+- **Efficient**: No redundant files, clear structure
+- **Concurrent Processing**: High-performance parallel execution
+- **Intelligent Fallback**: Hybrid strategies for optimal results
+
+## Development Status
+
+### ✅ Completed Features
+- ✅ All basic prompting methods
+- ✅ Advanced Progressive-Hint method
+- ✅ Program of Thoughts with code execution
+- ✅ Hybrid PoT-PHP strategy
+- ✅ Concurrent processing optimization
+- ✅ Progress tracking and monitoring
+- ✅ Comprehensive error handling
+- ✅ Token usage and cost tracking
+- ✅ Detailed analysis reports
+
+### 🚀 Future Enhancements
+- Additional hybrid strategies
+- More advanced error recovery
+- Performance optimization
+- Extended method comparison

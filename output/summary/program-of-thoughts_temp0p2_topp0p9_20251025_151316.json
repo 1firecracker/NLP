@@ -1,0 +1,32 @@
+{
+  "method_name": "program-of-thoughts",
+  "timestamp": "2025-10-25 15:13:16",
+  "hyperparameters": {
+    "temperature": 0.2,
+    "top_p": 0.9,
+    "max_tokens": 2048,
+    "frequency_penalty": 0.0,
+    "presence_penalty": 0.0
+  },
+  "performance_metrics": {
+    "total_questions": 200,
+    "correct_answers": 85,
+    "accuracy": 0.425,
+    "wall_clock_time": 1092.4010770320892,
+    "avg_processing_time_per_question": 5.462005385160446
+  },
+  "token_usage": {
+    "total_input_tokens": 0,
+    "total_output_tokens": 0,
+    "total_tokens": 0,
+    "avg_tokens_per_question": 0.0
+  },
+  "cost_analysis": {
+    "estimated_cost_usd": 0.0,
+    "cost_per_question": 0.0
+  },
+  "error_analysis": {
+    "error_count": 0,
+    "error_rate": 0.0
+  }
+}
