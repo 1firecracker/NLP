@@ -46,8 +46,8 @@ Four versions were evaluated, with accuracy results as follows:
 | 0.2         | 50.50%   |
 | 0.3         | 52.90%   |
 | 0.4         | 51.55%   |
-| 0.5         | 53.53%   |
-| 0.6         | 51.29%   |
+| 0.5         |**53.53%**  |
+| 0.6         | 52.77%   |
 
 → **Selected temperature: 0.5** (highest accuracy).
 
@@ -132,7 +132,7 @@ Dynamic hyperparameters are used per method (PoT at temp=0.2, PHP at temp=0.5).
 | Method Name               | Accuracy | Avg. Time/Question (s) | Avg. Tokens/Question | Notes |
 |---------------------------|----------|------------------------|----------------------|-------|
 | Zero-shot                 | 7.28%    | 0.60                   | 132.68               | Baseline: lowest cost, weakest performance |
-| Few-shot                  | 36.16%   | 3.29                   | 1,183.91             | Large accuracy gain, but high cost |
+| Few-shot                  | 36.32%   | 0.74                   | 1,168.62               | Large accuracy gain, but high cost |
 | Program-of-Thoughts       | 41.47%   | 1.21                   | 407.26               | Fastest method; better than Few-shot |
 | Progressive-Hint (PHP)    | 53.53%   | 8.75                   | 1,167.53             | Highest accuracy among single methods, but slowest |
 | **Hybrid PoT-PHP**        | **65.28%**| **2.58**               | **709.65**           | **Best overall: highest accuracy + high efficiency** |

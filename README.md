@@ -177,22 +177,22 @@ python main.py --method hybrid-pot-php --max-questions 50
 ### **Method Comparison**
 | Method | Accuracy | Avg Time/Question | Token Usage | Strategy |
 |--------|----------|-------------------|-------------|----------|
-| Zero-shot | 12.21% | 1.55s | 166.4 tokens | Direct prompting |
-| Few-shot | 36.16% | 3.29s | 1,183.9 tokens | Example-based |
-| Progressive-Hint | 53.53% | 1.07s | 1,168 tokens | Multi-round hints (temp=0.5) |
-| Program of Thoughts | 42.5% | 1.68s | 379 tokens | Code execution (temp=0.1) |
-| Hybrid PoT-PHP | 65.28% | 12.78s | 438 tokens | Intelligent fallback |
+| Zero-shot | 7.28% | 0.60s | 132.68 tokens | Direct prompting |
+| Few-shot | 36.32% | 0.74s | 1,168.62 tokens | Example-based |
+| Progressive-Hint | 53.53% | 8.75s | 1,167.53 tokens | Multi-round hints (temp=0.5) |
+| Program of Thoughts | 41.47% | 1.21s | 407.26 tokens | Code execution (temp=0.2) |
+| **Hybrid PoT-PHP** | **65.28%** | **2.58s** | **709.65 tokens** | **Intelligent fallback** |
 
 ### **Detailed Baseline Analysis**
 | Evaluation Dimension | Zero-shot | Few-shot | Analysis |
 |---------------------|-----------|----------|----------|
 | **Method Name** | Zero-shot | Few-shot | Zero-shot: no examples; Few-shot: provides few examples to guide the model |
 | **Total Questions** | 1,319 | 1,319 | Same sample size for fair comparison |
-| **Accuracy** | 12.21% | 36.16% | Few-shot accuracy improved by ~2.96x, significant effect |
-| **Total Processing Time** | 2,050.20s | 4,342.55s | Few-shot takes ~2.12x longer than Zero-shot |
-| **Avg Time per Question** | 1.55s | 3.29s | Few-shot slower due to longer input (with examples) |
-| **Total Token Usage** | 219,478 | 1,561,574 | Few-shot uses ~7.1x more tokens |
-| **Avg Tokens per Question** | 166.4 | 1,183.9 | Few-shot uses 1,017 more tokens per question |
+| **Accuracy** | 7.28% | 36.32% | Few-shot accuracy improved by ~5.0x, significant effect |
+| **Total Processing Time** | 786.08s | 982.38s | Few-shot takes ~1.25x longer than Zero-shot |
+| **Avg Time per Question** | 0.60s | 0.74s | Few-shot slower due to longer input (with examples) |
+| **Total Token Usage** | 175,010 | 1,541,407 | Few-shot uses ~8.8x more tokens |
+| **Avg Tokens per Question** | 132.68 | 1,168.62 | Few-shot uses 1,036 more tokens per question |
 
 ### **Progressive-Hint Method Evolution**
 | Version | Zero-shot | Few-shot | Logic Mod 1 | Logic Mod 2 | Accuracy |
@@ -229,11 +229,9 @@ python main.py --method hybrid-pot-php --max-questions 50
 #### **Program of Thoughts Temperature Tuning**
 | Temperature | Accuracy |
 |-------------|----------|
-| **0.1** | **42.5%** |
-| 0.2 | - |
-| 0.3 | - |
-| 0.4 | - |
-| 0.5 | - |
+| 0.1 | 41.4% |
+| **0.2** | **41.5%** |
+| 0.3 | 40.3% |
 
 ### **Concurrent Processing**
 - **Concurrency**: 5-10 parallel requests
