@@ -8,7 +8,7 @@ class Config:
     """配置管理类"""
     
     # 硅基流动 API 配置 (兼容OpenAI API)
-    OPENAI_API_KEY: str = "sk-ulfbgpjfvziuiaeuqhmuxskxdosfqilzookvutbonnhpeycw"  # 硅基流动API密钥
+    OPENAI_API_KEY: str = "sk-rgelgqzofgrgjlaaagzlpqyrywgvuyvepiruzxlnnvngzwqn"  # 硅基流动API密钥
     OPENAI_MODEL: str = "tencent/Hunyuan-MT-7B"  # 硅基流动模型
     OPENAI_BASE_URL: Optional[str] = "https://api.siliconflow.cn/v1"  # 硅基流动API端点
     
